@@ -179,3 +179,11 @@ atom_m = {
     'Ds': 271,
     'Rg': 272
 }
+
+# del to clean up auto completion in ipython
+del atomic_mass
+del gravitational_constant
+del Boltzmann
+del Stefan_Boltzmann
+del Avogadro
+del ConstantWarning
