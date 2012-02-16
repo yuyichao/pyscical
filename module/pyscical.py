@@ -12,7 +12,7 @@ mu0 = 4e-7 * pi
 epsilon0 = 1 / (mu0 * c**2)
 Z0 = mu0 * c
 k_e = 1 / (4 * pi * epsilon0)
-e, E = 1.602176565e-19, e
+e, E = 1.602176565e-19, e # e is defined in math
 G0 = 2 * e**2 / h
 K_J = 2 * e / h
 phi0 = h / (2 * e)
@@ -54,6 +54,7 @@ E_h = 2 * R_inf * h * c
 
 g_n = 9.80665
 
+# for chem maybe
 atom_m = {
     'H1': 1.00782503207,
     'H2': 2.0141017779,
