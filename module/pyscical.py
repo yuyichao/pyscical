@@ -38,7 +38,7 @@ l_P = sqrt(hbar * G / c**3)
 m_P = sqrt(hbar * c / G)
 E_P = m_P * c**2
 t_P = l_P / c
-q_P = sqrt(4 * pi * epsilon0 * hbar * c)
+q_P = sqrt(4 * pi * epsilon_0 * hbar * c)
 T_P = E_P / k_B
 
 keV = 1e3 * eV
@@ -55,7 +55,7 @@ mu_B = e * hbar / (2 * m_e)
 mu_N = e * hbar / (2 * m_p)
 R_inf = Rydberg
 a0 = alpha / (4 * pi * R_inf)
-r_e = e**2 / (4 * pi * epsilon0 * m_e * c**2)
+r_e = e**2 / (4 * pi * epsilon_0 * m_e * c**2)
 E_h = 2 * R_inf * h * c
 
 g_n = g
