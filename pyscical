@@ -21,7 +21,7 @@
 NOIPYTHON=${NOIPYTHON:-0}
 
 if [[ $NOIPYTHON == 0 ]] && type ipython &> /dev/null; then
-    python=ipython
+    python='ipython --no-confirm-exit'
 else
     python=python
 fi

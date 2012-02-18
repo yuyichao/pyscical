@@ -24,18 +24,22 @@ from numpy import *
 from pylab import *
 from scipy.constants import *
 
-G_N = G
 Z_0 = mu_0 * c
 k_e = 1 / (4 * pi * epsilon_0)
 G_0 = 2 * e**2 / h
 K_J = 2 * e / h
 phi_0 = h / (2 * e)
 R_K = h / e**2
-k_B = k
-F = N_A * e
+F_c = N_A * e
 
-l_P = sqrt(hbar * G / c**3)
-m_P = sqrt(hbar * c / G)
+# The original name might easily be overrided.
+G_N = G
+k_B = k
+R_g = R
+g_n = g
+
+l_P = sqrt(hbar * G_N / c**3)
+m_P = sqrt(hbar * c / G_N)
 E_P = m_P * c**2
 t_P = l_P / c
 q_P = sqrt(4 * pi * epsilon_0 * hbar * c)
@@ -58,7 +62,11 @@ a0 = alpha / (4 * pi * R_inf)
 r_e = e**2 / (4 * pi * epsilon_0 * m_e * c**2)
 E_h = 2 * R_inf * h * c
 
-g_n = g
+
+M_sun = 1.9891e30
+R_sun = 6.955e8
+M_earth = 5.9736e24
+R_earth = 6371.0e3
 
 # for chem maybe
 atom_m = {
