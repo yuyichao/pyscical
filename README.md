@@ -9,7 +9,7 @@ PySciCal is a free software released under GPLv3.
 ### Install
 
 #### On Arch Linux
-[AUR Package](https://aur.archlinux.org/packages.php?ID=51159)
+[AUR Package](https://aur.archlinux.org/packages.php?ID=56808)
 
 #### Everywhere else for now (From Source)
 
