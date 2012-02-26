@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with PySciCal.  If not, see <http://www.gnu.org/licenses/>.
 
-# from math import *
+#from ._general import *
 
 H = 1.00794 #average
 H1 = 1.00782503207

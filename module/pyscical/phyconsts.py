@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with PySciCal.  If not, see <http://www.gnu.org/licenses/>.
 
-from math import *
+from general import *
 from math import e as E
 from scipy.constants import *
 

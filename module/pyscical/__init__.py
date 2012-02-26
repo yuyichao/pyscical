@@ -18,9 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with PySciCal.  If not, see <http://www.gnu.org/licenses/>.
 
-from math import *
-from numpy import *
-from pylab import *
+from ._general import *
 from .phyconsts import *
 from .astro import *
 from . import atom_mass as at_m
