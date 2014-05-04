@@ -43,9 +43,14 @@ def _def_scaled_units(baseval, basesym, basename):
                 ('a', 'atto', 1e-18),
                 ('z', 'zepto', 1e-21))
     for presym, prename, preval in _prefixes:
+        if basesym:
+            sym = presym + basesym
+        elif prename:
+            sym = prename
+        else:
+            continue
         if not (basesym or presym):
             continue
-        sym = presym + basesym
         if not prename:
             name = basename
         elif not basename:
