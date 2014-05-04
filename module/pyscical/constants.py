@@ -65,8 +65,8 @@ t_P = _reg(l_P / c, 'Planck time')
 q_P = _reg(sqrt(4 * pi * epsilon_0 * hbar * c), 'Planck charge')
 T_P = _reg(E_P / k_B, 'Planck temperature')
 
-# K_J = 2 * e / h
-# R_K = h / e**2
+K_J = _reg(2 * e / h, 'Josephson constant')
+R_K = _reg(h / e**2, 'von Klitzing constant')
 phi_0 = _reg(h / (2 * e), 'magnetic flux quantum')
 F_c = _reg(N_A * e, 'Faraday constant')
 
