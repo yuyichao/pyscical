@@ -40,7 +40,6 @@ h = _reg(_constants.h, 'Planck constant')
 hbar = _reg(_constants.hbar, 'reduced Planck constant')
 G_N = _reg(_constants.G, 'gravitational constant')
 g_0 = _reg(_constants.g, 'standard gravity')
-g_n = g_0
 E = _reg(E, 'Napier constant')
 e = _reg(_constants.e, 'elementary charge')
 e_0 = e
@@ -80,3 +79,7 @@ a_0 = _reg(alpha / (4 * pi * R_inf), 'Bohr radius')
 r_e = _reg(e**2 / (4 * pi * epsilon_0 * m_e * c**2),
            'classical electron radius')
 E_h = _reg(2 * R_inf * h * c, 'hartree')
+
+g_e = _reg(abs(_constants.value('electron g factor')), 'electron g factor')
+g_n = _reg(_constants.value('neutron g factor'), 'neutron g factor')
+g_p = _reg(_constants.value('proton g factor'), 'proton g factor')
