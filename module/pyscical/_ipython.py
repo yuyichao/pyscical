@@ -24,7 +24,7 @@ import os
 ipython = get_ipython()
 
 def nb_save(fname):
-    hist_gen = ipython.shell.history_manager.get_range()
+    hist_gen = ipython.history_manager.get_range()
     if not fname.endswith('.py'):
         fname += '.py'
     if os.path.isfile(fname):
@@ -33,6 +33,7 @@ def nb_save(fname):
             print('Operation cancelled.')
             return
     with open(fname, 'w', encoding='utf-8') as f:
+        f.write("#!/usr/bin/env python\n")
         f.write("# coding: utf-8\n")
         for hist in hist_gen:
             f.write(py3compat.cast_unicode(hist[2]) + '\n')
