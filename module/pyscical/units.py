@@ -1,4 +1,4 @@
-# Copyright 2011 Yu Yichao
+# Copyright 2012 Yu Yichao
 # yyc1992@gmail.com
 #
 # This file is part of PySciCal.
@@ -16,51 +16,75 @@
 # You should have received a copy of the GNU General Public License
 # along with PySciCal.  If not, see <http://www.gnu.org/licenses/>.
 
-from .phyconsts import c, eV
+from .constants import *
+from .constants import _reg, _constants
+import sys
 
-km = 1e3
-dm = 1e-1
-cm = 1e-2
-mm = 1e-3
-um = 1e-6
-nm = 1e-9
-pm = 1e-12
-fm = 1e-15
+_module = sys.modules[__name__]
+def _def_scaled_units(baseval, basesym, basename):
+    _prefixes = (('Y', 'yotta', 1e24),
+                ('Z', 'zetta', 1e21),
+                ('E', 'exa', 1e18),
+                ('P', 'peta', 1e15),
+                ('T', 'tera', 1e12),
+                ('G', 'zetta', 1e9),
+                ('M', 'zetta', 1e6),
+                ('k', 'zetta', 1e3),
+                ('h', 'hecto', 1e2),
+                ('D', 'deka', 1e1),
+                ('', '', 1),
+                ('d', 'deci', 1e-1),
+                ('c', 'centi', 1e-2),
+                ('m', 'milli', 1e-3),
+                ('u', 'micro', 1e-6),
+                ('n', 'nano', 1e-9),
+                ('p', 'pico', 1e-12),
+                ('f', 'femto', 1e-15),
+                ('a', 'atto', 1e-18),
+                ('z', 'zepto', 1e-21))
+    for presym, prename, preval in _prefixes:
+        if not basesym:
+            sym = presym
+        else:
+            sym = presym + basesym
+        if not prename:
+            name = basename
+        else:
+            name = ' '.join((prename, basename))
+        setattr(_module, sym, _reg(preval * baseval, name))
 
-ft = foot = 0.3048
-inch = 25.4 * mm
-yd = yard = 3 * ft
-mile = 5280 * ft
+_def_scaled_units(e_0, 'eV', 'electron volt')
+_def_scaled_units(e_0 / c**2, 'eVm', 'electron volt mass')
+_def_scaled_units(e_0 / h, 'eVf', 'electron volt frequency')
+_def_scaled_units(e_0 / k_B, 'eVT', 'electron volt temperature')
 
-L = liter = 1e-3
-dL = 1e-4
-cL = 1e-5
-mL = 1e-6
+_def_scaled_units(1, 'Hz', 'Hertz')
+_def_scaled_units(h / k_B, 'HzT', 'Hertz temperature')
+_def_scaled_units(h / c**2, 'Hzm', 'Hertz mass')
 
-# Common time units
+_def_scaled_units(1, 'm', 'meter')
+_def_scaled_units(1, 's', 'second')
+_def_scaled_units(1e-3, 'g', 'gram')
+_def_scaled_units(1, 'Pa', 'Pascal')
+_def_scaled_units(1e-3, 'L', 'liter')
 
-ms = 1e-3
-us = 1e-6
-ns = 1e-9
-ps = 1e-12
+ft = foot = _reg(0.3048, 'foot')
+inch = _reg(25.4e-3, 'inch')
+yd = yard = _reg(3 * ft, 'yard')
+mile = _reg(5280 * ft, 'mile')
 
-minute = 60
-hour = 3600
-day = 24 * hour
+minute = _reg(60, 'minute')
+hour = _reg(3600, 'hour')
+day = _reg(24 * hour, 'day')
+week = _reg(7 * day, 'week')
+month = _reg(30 * day, 'month')
+yr = year = _reg(365 * day, 'year')
+Julian_year = _reg(_constants.Julian_year, 'Julian year')
 
-a = year = 365 * day
+bar = _reg(1e5, 'bar')
+pound = _reg(0.45359237, 'pound')
+psi = _reg(pound / inch ** 2, 'pound per square inche')
 
-g = 1e-3
-mg = 1e-6
-ug = 1e-9
+torr = mmHg = _reg(13.5951 * g_0, 'millimeter mercury pressure')
 
-kPa = 1e3
-bar = 1e5
-pound = 0.45359237
-psi = pound / inch ** 2
-
-dHg0 = 13.5951
-mmHg = dHg0 * 9.80665
-quart = 231 * inch**3
-
-ly = lightyear = c * year
+ly = light_year = _reg(c * year, 'light year')

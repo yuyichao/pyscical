@@ -1,4 +1,4 @@
-# Copyright 2011 Yu Yichao
+# Copyright 2012 Yu Yichao
 # yyc1992@gmail.com
 #
 # This file is part of PySciCal.
@@ -15,8 +15,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PySciCal.  If not, see <http://www.gnu.org/licenses/>.
-
-#from ._general import *
 
 M_sun = 1.9891e30
 R_sun = 6.955e8

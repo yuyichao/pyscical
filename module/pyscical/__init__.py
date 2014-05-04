@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright 2011 Yu Yichao
+# Copyright 2012 Yu Yichao
 # yyc1992@gmail.com
 #
 # This file is part of PySciCal.
@@ -26,7 +26,7 @@ else:
     from ._ipython import *
 
 from ._general import *
-from .phyconsts import *
+from .constants import *
 from .astro import *
 from . import atom_mass as at_m
 from . import units

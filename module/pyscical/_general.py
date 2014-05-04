@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright 2011 Yu Yichao
+# Copyright 2012 Yu Yichao
 # yyc1992@gmail.com
 #
 # This file is part of PySciCal.
