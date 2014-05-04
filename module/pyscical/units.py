@@ -43,15 +43,18 @@ def _def_scaled_units(baseval, basesym, basename):
                 ('a', 'atto', 1e-18),
                 ('z', 'zepto', 1e-21))
     for presym, prename, preval in _prefixes:
-        if not basesym:
-            sym = presym
-        else:
-            sym = presym + basesym
+        if not (basesym or presym):
+            continue
+        sym = presym + basesym
         if not prename:
             name = basename
+        elif not basename:
+            name = prename
         else:
             name = ' '.join((prename, basename))
         setattr(_module, sym, _reg(preval * baseval, name))
+
+_def_scaled_units(1, '', '')
 
 _def_scaled_units(e_0, 'eV', 'electron volt')
 _def_scaled_units(e_0 / c**2, 'eVm', 'electron volt mass')
@@ -62,11 +65,16 @@ _def_scaled_units(1, 'Hz', 'Hertz')
 _def_scaled_units(h / k_B, 'HzT', 'Hertz temperature')
 _def_scaled_units(h / c**2, 'Hzm', 'Hertz mass')
 
+_def_scaled_units(1, 'K', 'Kelvin')
+_def_scaled_units(k_B / h, 'Kf', 'Kelvin frequency')
+
 _def_scaled_units(1, 'm', 'meter')
 _def_scaled_units(1, 's', 'second')
 _def_scaled_units(1e-3, 'g', 'gram')
 _def_scaled_units(1, 'Pa', 'Pascal')
 _def_scaled_units(1e-3, 'L', 'liter')
+
+D = _reg(1e-21 / c, 'Debye')
 
 ft = foot = _reg(0.3048, 'foot')
 inch = _reg(25.4e-3, 'inch')

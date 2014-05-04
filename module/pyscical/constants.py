@@ -33,6 +33,7 @@ Constants = Constants()
 _reg = Constants._reg
 
 c = _reg(299792458, 'speed of light in vaccum')
+c_0 = c
 mu_0 = _reg(4 * pi * 1e-7, 'vacuum permeability')
 epsilon_0 = _reg(1 / mu_0 / c**2, 'vacuum permittivity')
 h = _reg(_constants.h, 'Planck constant')
@@ -72,6 +73,9 @@ F_c = _reg(N_A * e, 'Faraday constant')
 
 mu_B = _reg(e * hbar / (2 * m_e), 'Bohr magneton')
 mu_N = _reg(e * hbar / (2 * m_p), 'nuclear magneton')
+mu_Bf = _reg(mu_B / h, 'Bohr magneton frequency')
+mu_Nf = _reg(mu_B / h, 'nuclear magneton frequency')
+
 a_0 = _reg(alpha / (4 * pi * R_inf), 'Bohr radius')
 r_e = _reg(e**2 / (4 * pi * epsilon_0 * m_e * c**2),
            'classical electron radius')
