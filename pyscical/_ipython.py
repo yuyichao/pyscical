@@ -18,8 +18,10 @@
 
 # IPython Specifit stuff
 
+from os import path as _path
+import sys
+
 from IPython.utils import py3compat
-import os
 
 ipython = get_ipython()
 
@@ -27,13 +29,13 @@ def nb_save(fname):
     hist_gen = ipython.history_manager.get_range()
     if not fname.endswith('.py'):
         fname += '.py'
-    if os.path.isfile(fname):
+    if _path.isfile(fname):
         ans = input('File `%s` exists. Overwrite (y/[N])? ' % fname)
         if ans.lower() not in ['y','yes']:
             print('Operation cancelled.')
             return
     with open(fname, 'w', encoding='utf-8') as f:
-        f.write("#!/usr/bin/env python\n")
+        f.write("#!%s\n" % sys.executable)
         f.write("# coding: utf-8\n")
         for hist in hist_gen:
             f.write(py3compat.cast_unicode(hist[2]) + '\n')

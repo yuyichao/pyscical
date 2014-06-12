@@ -18,3 +18,7 @@
 
 from math import *
 from numpy import *
+try:
+    from pylab import *
+except:
+    pass

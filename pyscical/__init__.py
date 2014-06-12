@@ -30,3 +30,4 @@ from .constants import *
 from .units import *
 from .astro import *
 from . import atom_mass as at_m
+from . import atomic
