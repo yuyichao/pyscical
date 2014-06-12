@@ -1,0 +1,10 @@
+python_install_module(pyscical
+  astro.py
+  atomic.py
+  atom_mass.py
+  constants.py
+  _general.py
+  __init__.py
+  _ipython.py
+  units.py
+  value.py)
