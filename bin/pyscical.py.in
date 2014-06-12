@@ -5,7 +5,7 @@ try:
 except:
     import code as _code
     def _embed():
-        _code.interact(local=locals())
+        _code.interact(local=globals())
 
 from pyscical import *
 import pyscical
