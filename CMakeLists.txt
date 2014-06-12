@@ -1,4 +1,4 @@
-project(QtCurve)
+project(pyscical)
 
 ## Setup
 cmake_minimum_required(VERSION 2.8)
@@ -17,6 +17,10 @@ include(CMakeCMacros)
 
 if(NOT BIN_DIR)
   set(BIN_DIR bin)
+endif()
+
+if(NOT BIN_NAME)
+  set(BIN_NAME pyscical)
 endif()
 
 cmake_c_add_flags(CMAKE_C_FLAGS -Wall -Wextra -std=gnu99)

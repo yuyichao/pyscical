@@ -1,0 +1,12 @@
+#!@PYTHON_EXECUTABLE@
+
+try:
+    from IPython import embed as _embed
+except:
+    import code as _code
+    def _embed():
+        _code.interact(local=locals())
+
+from pyscical import *
+import pyscical
+_embed()
