@@ -17,4 +17,28 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from math import *
-from numpy import *
+
+h = 6.62606957e-34
+hbar = h / 2 / pi
+G = 6.67384e-11
+g = 9.80665
+R = 8.3144621
+alpha = 0.0072973525698
+N_A = 6.02214129e+23
+k = 1.3806488e-23
+sigma = 5.670373e-08
+Wien = 0.0028977721
+Rydberg = 10973731.568539
+m_e = 9.10938291e-31
+m_n = 1.672621777e-27
+m_p = 1.674927351e-27
+
+_values = {
+    'electron g factor': 2.00231930436153,
+    'neutron g factor': -3.82608545,
+    'proton g factor': 5.585694713
+    }
+def value(name):
+    return _values[name]
+
+Julian_year = 31557600.0

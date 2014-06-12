@@ -18,7 +18,10 @@
 
 from math import *
 from math import e as E
-from scipy import constants as _constants
+try:
+    from scipy import constants as _constants
+except:
+    from . import _const as _constants
 from .value import Value
 
 class Constants(dict):

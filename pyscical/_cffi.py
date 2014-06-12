@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (C) 2012~2014 by Yichao Yu
+# Copyright (C) 2014~2014 by Yichao Yu
 # yyc1992@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,5 +16,27 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from math import *
-from numpy import *
+from cffi import FFI
+from os import path as _path
+
+_ffi = FFI()
+_basedir = _path.dirname(__file__)
+
+def _get_api_header():
+    with open(_path.join(_basedir, 'api.h')) as f:
+        return f.read()
+
+_ffi.cdef(_get_api_header())
+
+def _import_library():
+    names = list(_get_wrapcl_so_names())
+    for name in names:
+        try:
+            return _ffi.dlopen(name)
+        except OSError:
+            pass
+
+    raise RuntimeError("could not find PyOpenCL wrapper library. (tried: %s)"
+        % ", ".join(names))
+
+_lib = _ffi.dlopen(_path.join(_basedir, '_pyscical.so'))

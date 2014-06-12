@@ -17,15 +17,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .constants import *
-try:
-    from numba import jit
-except:
-    def jit(signature_or_function=None, *args, **kwargs):
-        if callable(signature_or_function):
-            return signature_or_function
-        return lambda func: func
+import sys
 
-@jit('f8(f8, f8, f8, f8, f8)', nopython=True)
 def compose_g(J_sum, J1, J2, g1, g2):
     if not J_sum:
         return 0.0
@@ -35,13 +28,16 @@ def compose_g(J_sum, J1, J2, g1, g2):
     return (g1 * (J_sum_2 + J1_2 - J2_2) +
             g2 * (J_sum_2 + J2_2 - J1_2)) / 2 / J_sum_2
 
-@jit('f8(f8, f8, f8)', nopython=True)
 def compose_gJ(J, L, S):
     return compose_g(J, L, S, 1.0, g_e)
 
-@jit('f8(f8, f8, f8, f8, f8, f8)', nopython=True)
-def _compose_gF(F, I, J, L, S, g_I):
+def compose_gF(F, I, J, L, S, g_I=0.0):
     return compose_g(F, I, J, g_I, compose_gJ(J, L, S))
 
-def compose_gF(F, I, J, L, S, g_I=0.0):
-    return _compose_gF(F, I, J, L, S, g_I)
+# pure python version is faster than cffi wrapper on pypy
+if '__pypy__' not in sys.modules:
+    from ._cffi import _ffi, _lib
+    compose_g = _lib.compose_g
+    compose_gJ = _lib.compose_gJ
+    def compose_gF(F, I, J, L, S, g_I=0.0):
+        return _lib.compose_gF(F, I, J, L, S, g_I)

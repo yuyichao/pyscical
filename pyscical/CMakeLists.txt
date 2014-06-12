@@ -2,7 +2,9 @@ python_install_module(pyscical
   astro.py
   atomic.py
   atom_mass.py
+  _cffi.py
   constants.py
+  _const.py
   _general.py
   __init__.py
   _ipython.py

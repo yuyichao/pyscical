@@ -45,7 +45,7 @@ def compile_file(infile):
         py_compile.compile(infile, doraise=True)
         return 0
     except py_compile.PyCompileError as e:
-        print(e.msg())
+        print(e.msg)
         return 1
 
 def main(argv):

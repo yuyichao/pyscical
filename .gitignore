@@ -2,6 +2,6 @@
 __pycache__/
 tmp/
 *.egg-info/
-build/
+build*/
 *.pyc
 *.pyo
