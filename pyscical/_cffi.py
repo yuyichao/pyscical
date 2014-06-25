@@ -27,16 +27,4 @@ def _get_api_header():
         return f.read()
 
 _ffi.cdef(_get_api_header())
-
-def _import_library():
-    names = list(_get_wrapcl_so_names())
-    for name in names:
-        try:
-            return _ffi.dlopen(name)
-        except OSError:
-            pass
-
-    raise RuntimeError("could not find PyOpenCL wrapper library. (tried: %s)"
-        % ", ".join(names))
-
 _lib = _ffi.dlopen(_path.join(_basedir, '_pyscical.so'))
