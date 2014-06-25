@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-H = 1.00794 #average
+H = 1.00794  # average
 H1 = 1.00782503207
 H2 = 2.0141017779
 D = 2.0141017779

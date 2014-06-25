@@ -22,6 +22,7 @@ from os import path as _path
 _ffi = FFI()
 _basedir = _path.dirname(__file__)
 
+
 def _get_api_header():
     with open(_path.join(_basedir, 'api.h')) as f:
         return f.read()

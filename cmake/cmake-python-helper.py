@@ -24,8 +24,11 @@
 
 from __future__ import print_function
 
+
 def get_sys_info():
-    import sys, distutils.sysconfig, imp
+    import sys
+    import distutils.sysconfig
+    import imp
     print("exec_prefix:%s" % sys.exec_prefix)
     print("short_version:%s" % sys.version[:3])
     print("long_version:%s" % sys.version.split()[0])
@@ -39,6 +42,7 @@ def get_sys_info():
     print("magic_tag:%s" % magic_tag)
     return 0
 
+
 def compile_file(infile):
     import py_compile
     try:
@@ -47,6 +51,7 @@ def compile_file(infile):
     except py_compile.PyCompileError as e:
         print(e.msg)
         return 1
+
 
 def main(argv):
     if argv[1] == '--get-sys-info':

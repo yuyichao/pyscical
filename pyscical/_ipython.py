@@ -25,13 +25,14 @@ from IPython.utils import py3compat
 
 ipython = get_ipython()
 
+
 def nb_save(fname):
     hist_gen = ipython.history_manager.get_range()
     if not fname.endswith('.py'):
         fname += '.py'
     if _path.isfile(fname):
         ans = input('File `%s` exists. Overwrite (y/[N])? ' % fname)
-        if ans.lower() not in ['y','yes']:
+        if ans.lower() not in ['y', 'yes']:
             print('Operation cancelled.')
             return
     with open(fname, 'w', encoding='utf-8') as f:

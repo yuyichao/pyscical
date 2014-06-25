@@ -19,6 +19,7 @@
 from .constants import *
 import sys
 
+
 def compose_g(J_sum, J1, J2, g1, g2):
     if not J_sum:
         return 0.0
@@ -28,8 +29,10 @@ def compose_g(J_sum, J1, J2, g1, g2):
     return (g1 * (J_sum_2 + J1_2 - J2_2) +
             g2 * (J_sum_2 + J2_2 - J1_2)) / 2 / J_sum_2
 
+
 def compose_gJ(J, L, S):
     return compose_g(J, L, S, 1.0, g_e)
+
 
 def compose_gF(F, I, J, L, S, g_I=0.0):
     return compose_g(F, I, J, g_I, compose_gJ(J, L, S))
@@ -39,5 +42,6 @@ if '__pypy__' not in sys.modules:
     from ._cffi import _ffi, _lib
     compose_g = _lib.compose_g
     compose_gJ = _lib.compose_gJ
+
     def compose_gF(F, I, J, L, S, g_I=0.0):
         return _lib.compose_gF(F, I, J, L, S, g_I)

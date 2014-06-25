@@ -38,6 +38,8 @@ _values = {
     'neutron g factor': -3.82608545,
     'proton g factor': 5.585694713
     }
+
+
 def value(name):
     return _values[name]
 

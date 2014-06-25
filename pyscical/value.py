@@ -16,11 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
 class Value(float):
     def __new__(cls, val, *args, **kwargs):
         return float.__new__(cls, val)
+
     def __init__(self, val, name=None):
         self.__name = name
+
     @property
     def name(self):
         return self.__name

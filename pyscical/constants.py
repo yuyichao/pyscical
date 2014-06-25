@@ -24,6 +24,7 @@ except:
     from . import _const as _constants
 from .value import Value
 
+
 class Constants(dict):
     def _reg(self, val, name):
         val = Value(val, name)
