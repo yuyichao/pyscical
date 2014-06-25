@@ -10,3 +10,7 @@ python_install_module(pyscical
   _ipython.py
   units.py
   value.py)
+python_install_module(pyscical/ocl
+  ocl/__init__.py
+  ocl/elwise.py
+  ocl/ode.py)

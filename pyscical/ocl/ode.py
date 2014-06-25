@@ -54,19 +54,15 @@ def get_group_sizes(dev, n, limit):
     return (group_count * work_items_per_group,), (work_items_per_group,)
 
 
-def run_kernel(knl, queue, gs, ls, size, *args, wait_for=()):
-    wait_for_copied = False
+def _run_kernel(knl, queue, gs, ls, size, wait_for, *args, **kws):
+    wait_for = list(wait_for) if wait_for else []
 
     actual_args = []
     for arg in args:
         if isinstance(arg, Array):
             actual_args.append(arg.base_data)
             actual_args.append(arg.offset)
-            if arg.events:
-                if not wait_for_copied:
-                    wait_for = list(wait_for)
-                    wait_for_copied = True
-                wait_for.extend(arg.events)
+            wait_for.extend(arg.events)
         else:
             actual_args.append(arg)
         actual_args.append(size)
@@ -105,25 +101,23 @@ def solve_ode(t0, t1, h, y0, f, queue):
         dev.max_work_group_size)
     g_size, l_size = get_group_sizes(dev, total_size, max_group_size)
 
-    def _run_comb_knls(l, *args, wait_for=()):
-        return run_kernel(comb_knls[l], queue, g_size, l_size, total_size,
-                          *args, wait_for=wait_for)
+    def _run_comb_knls(l, wait_for, *args):
+        return _run_kernel(comb_knls[l], queue, g_size, l_size, total_size,
+                           wait_for, *args)
 
     for i in xrange(n_steps):
         prev_y = ys[i]
         next_y = ys[i + 1]
         tn = t0 + i * h
-        prev_evt = f(tn, prev_y, ks[0], wait_for=(prev_evt,))
-        prev_evt = _run_comb_knls(0, tmp_y, prev_y, ks[0], h_3,
-                                  wait_for=(prev_evt,))
-        prev_evt = f(tn + h_3, tmp_y, ks[1], wait_for=(prev_evt,))
-        prev_evt = _run_comb_knls(1, tmp_y, prev_y, ks[0], -h_3, ks[1], h,
-                                  wait_for=(prev_evt,))
-        prev_evt = f(tn + h2_3, tmp_y, ks[2], wait_for=(prev_evt,))
-        prev_evt = _run_comb_knls(2, tmp_y, prev_y, ks[0], h, ks[1], -h,
-                                  ks[2], h, wait_for=(prev_evt,))
-        prev_evt = f(tn + h, tmp_y, ks[3], wait_for=(prev_evt,))
-        prev_evt = _run_comb_knls(3, next_y, prev_y, ks[0], h_8, ks[1], h3_8,
-                                  ks[2], h3_8, ks[3], h_8,
-                                  wait_for=(prev_evt,))
+        prev_evt = f(tn, prev_y, ks[0], wait_for=[prev_evt])
+        prev_evt = _run_comb_knls(0, [prev_evt], tmp_y, prev_y, ks[0], h_3)
+        prev_evt = f(tn + h_3, tmp_y, ks[1], wait_for=[prev_evt])
+        prev_evt = _run_comb_knls(1, [prev_evt], tmp_y, prev_y, ks[0], -h_3,
+                                  ks[1], h)
+        prev_evt = f(tn + h2_3, tmp_y, ks[2], wait_for=[prev_evt])
+        prev_evt = _run_comb_knls(2, [prev_evt], tmp_y, prev_y, ks[0], h,
+                                  ks[1], -h, ks[2], h)
+        prev_evt = f(tn + h, tmp_y, ks[3], wait_for=[prev_evt])
+        prev_evt = _run_comb_knls(3, [prev_evt], next_y, prev_y, ks[0], h_8,
+                                  ks[1], h3_8, ks[2], h3_8, ks[3], h_8)
     return ys, prev_evt
