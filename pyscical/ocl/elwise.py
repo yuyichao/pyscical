@@ -21,12 +21,21 @@ import numpy as np
 import pyopencl as cl
 import pyopencl.elementwise as cl_elwise
 import pyopencl.array as cl_array
-from pyopencl.tools import VectorArg, ScalarArg
+from pyopencl.tools import VectorArg, ScalarArg, dtype_to_ctype
 
 try:
     xrange = xrange
 except:
     xrange = range
+
+
+class ConstArg(VectorArg):
+    def __init__(self, dtype, name):
+        VectorArg.__init__(self, dtype, name, with_offset=True)
+
+    def declarator(self):
+        return "__global const %s *%s__base, long %s__offset" % (
+            dtype_to_ctype(self.dtype), self.name, self.name)
 
 
 def _get_mul_expr_fmt(t1, t2):
@@ -74,6 +83,23 @@ def lin_comb_kernel(ctx, res_type, ary_type, weight_type, length, name=None):
     name = name or 'lin_comb_kernel'
     return cl_elwise.get_elwise_kernel(
         ctx, [VectorArg(res_type, 'res', with_offset=True)] +
-        [VectorArg(ary_type, 'ary%d' % i) for i in xrange(length)] +
+        [ConstArg(ary_type, 'ary%d' % i) for i in xrange(length)] +
         [ScalarArg(weight_type, 'weight%d' % i) for i in xrange(length)],
         'res[i] = ' + expr, name=name, auto_preamble=True)
+
+
+def lin_comb_diff_kernel(ctx, res_type, base_type, ary_type, weight_type,
+                         length, name=None):
+    res_type = np.dtype(res_type)
+    base_type = np.dtype(base_type)
+    ary_type = np.dtype(ary_type)
+    weight_type = np.dtype(weight_type)
+    mul_fmt = get_mul_expr(ary_type, 'ary%d[i]', weight_type, 'weight%d[i]')
+    expr = ' + '.join((mul_fmt % (i, i)) for i in xrange(length))
+    name = name or 'lin_comb_diff_kernel'
+    return cl_elwise.get_elwise_kernel(
+        ctx, [VectorArg(res_type, 'res', with_offset=True),
+              ConstArg(base_type, 'base_ary')] +
+        [ConstArg(ary_type, 'ary%d' % i) for i in xrange(length)] +
+        [ScalarArg(weight_type, 'weight%d' % i) for i in xrange(length)],
+        'res[i] = base_ary[i] + ' + expr, name=name, auto_preamble=True)
