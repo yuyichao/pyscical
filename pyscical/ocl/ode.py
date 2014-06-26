@@ -16,7 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from . import elwise
+from pyscical.ocl.elwise import (lin_comb_diff_kernel,
+                                 get_group_sizes,
+                                 run_kernel as run_elwise_kernel)
 
 import pyopencl as cl
 import pyopencl.array as cl_array
@@ -34,7 +36,7 @@ def solve_ode(t0, t1, h, y0, f, queue):
     y_type = y0.dtype
     weight_type = (np.float64 if y_type in (np.float64, np.complex128)
                    else np.float32)
-    nsteps = (t1 - t0) // h
+    nsteps = int((t1 - t0) / h)
     # Arrays for results in each steps
     ys = [cl_array.Array(queue, y0.shape, y_type, strides=y0.strides)
           for i in xrange(nsteps + 1)]
@@ -49,17 +51,16 @@ def solve_ode(t0, t1, h, y0, f, queue):
     h3_8 = h * 3 / 8.
     h_3 = h / 3.
     h2_3 = h * 2 / 3.
-    comb_knls = [elwise.lin_comb_diff_kernel(ctx, y_type, y_type, y_type,
-                                             weight_type, i,
-                                             name='ode_lin_diff_%d' % i)
+    comb_knls = [lin_comb_diff_kernel(ctx, y_type, y_type, y_type, weight_type,
+                                      i, name='ode_lin_diff_%d' % i)
                  for i in xrange(1, 5)]
-    g_size, l_size = elwise.get_group_sizes(total_size, dev, comb_knls[0])
+    g_size, l_size = get_group_sizes(total_size, dev, comb_knls[0])
 
     def _run_comb_knls(l, wait_for, *args):
-        return elwise.run_kernel(comb_knls[l], queue, g_size, l_size,
+        return run_elwise_kernel(comb_knls[l], queue, g_size, l_size,
                                  total_size, wait_for, *args)
 
-    for i in xrange(n_steps):
+    for i in xrange(nsteps):
         prev_y = ys[i]
         next_y = ys[i + 1]
         tn = t0 + i * h
