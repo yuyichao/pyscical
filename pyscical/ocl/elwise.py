@@ -175,3 +175,49 @@ def lin_comb_diff_kernel(ctx, res_type, base_type, ary_type, weight_type,
         [ConstArg(ary_type, 'ary%d' % i) for i in xrange(length)] +
         [ScalarArg(weight_type, 'weight%d' % i) for i in xrange(length)],
         'res[i] = ' + expr, name=name, auto_preamble=True)
+
+
+def get_group_sizes(n, dev, kernel=None):
+    max_work_items = dev.max_work_group_size
+    if kernel is not None:
+        max_work_items = min(
+            max_work_items, kernel.get_work_group_info(
+                cl.kernel_work_group_info.WORK_GROUP_SIZE, dev))
+    min_work_items = min(32, max_work_items)
+    max_groups = dev.max_compute_units * 4 * 8
+    # 4 to overfill the device
+    # 8 is an Nvidia constant--that's how many
+    # groups fit onto one compute device
+
+    if n < min_work_items:
+        group_count = 1
+        work_items_per_group = min_work_items
+    elif n < (max_groups * min_work_items):
+        group_count = (n + min_work_items - 1) // min_work_items
+        work_items_per_group = min_work_items
+    elif n < (max_groups * max_work_items):
+        group_count = max_groups
+        grp = (n + min_work_items - 1) // min_work_items
+        work_items_per_group = (
+            (grp + max_groups - 1) // max_groups) * min_work_items
+    else:
+        group_count = max_groups
+        work_items_per_group = max_work_items
+
+    return (group_count * work_items_per_group,), (work_items_per_group,)
+
+
+def run_kernel(knl, queue, gs, ls, size, wait_for, *args, **kws):
+    wait_for = list(wait_for) if wait_for else []
+
+    actual_args = []
+    for arg in args:
+        if isinstance(arg, cl_array.Array):
+            actual_args.append(arg.base_data)
+            actual_args.append(arg.offset)
+            wait_for.extend(arg.events)
+        else:
+            actual_args.append(arg)
+    actual_args.append(size)
+
+    return knl(queue, gs, ls, *actual_args, wait_for=wait_for)
