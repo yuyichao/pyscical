@@ -61,8 +61,8 @@ def test_lin_comb(ctx_factory, arg_type):
         if arg_type in (np.float64, np.complex128):
             pytest.skip('Device does not support double.')
     n = 100000
-    a_np = np.random.randn(n).astype(arg_type)
-    b_np = np.random.randn(n).astype(arg_type)
+    a_np = (np.random.randn(n) * 10).astype(arg_type)
+    b_np = (np.random.randn(n) * 10).astype(arg_type)
     queue = cl.CommandQueue(ctx)
 
     a_g = cl.array.to_device(queue, a_np)
@@ -81,3 +81,37 @@ def test_lin_comb(ctx_factory, arg_type):
     # Check on CPU with Numpy:
     res_np = res_g.get()
     assert np.linalg.norm(res_np - (2 * a_np + 3 * b_np)) == 0
+
+
+@pytest.mark.parametrize("arg_type", [np.float32, np.float64,
+                                      np.complex64, np.complex128])
+def test_lin_comb_diff(ctx_factory, arg_type):
+    ctx = ctx_factory()
+    dev, = ctx.devices
+    if not has_double_support(dev):
+        if arg_type in (np.float64, np.complex128):
+            pytest.skip('Device does not support double.')
+    n = 100000
+    a_np = (np.random.randn(n)).astype(arg_type)
+    b_np = (np.random.randn(n)).astype(arg_type)
+    c_np = (np.random.randn(n) * 10).astype(arg_type)
+    queue = cl.CommandQueue(ctx)
+
+    a_g = cl.array.to_device(queue, a_np)
+    b_g = cl.array.to_device(queue, b_np)
+    c_g = cl.array.to_device(queue, c_np)
+    res_g = cl.array.empty_like(a_g)
+    lin_comb_diff = lin_comb_diff_kernel(ctx, arg_type, arg_type,
+                                         arg_type, np.float32, 2)
+    gs, ls = get_group_sizes(n, dev, lin_comb_diff)
+
+    evt = run_elwise_kernel(lin_comb_diff, queue, gs, ls, n, [],
+                            res_g, c_g, a_g, b_g, 2, 3)
+    evt.wait()
+
+    # Check on GPU with PyOpenCL Array:
+    assert np.linalg.norm((res_g - (c_g + 2 * a_g + 3 * b_g)).get()) <= 1e-4
+
+    # Check on CPU with Numpy:
+    res_np = res_g.get()
+    assert np.linalg.norm(res_np - (c_np + 2 * a_np + 3 * b_np)) <= 1e-4
