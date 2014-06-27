@@ -30,7 +30,7 @@ except:
     xrange = range
 
 
-def solve_ode(t0, t1, h, y0, f, queue):
+def solve_ode(t0, t1, h, y0, f, queue, wait_for=None):
     ctx = queue.context
     dev = queue.device
     y_type = y0.dtype
@@ -46,7 +46,8 @@ def solve_ode(t0, t1, h, y0, f, queue):
     total_size = ys[0].size
     # initialize
     prev_evt = cl.enqueue_copy(queue, ys[0].base_data, y0,
-                               device_offset=ys[0].offset, is_blocking=False)
+                               device_offset=ys[0].offset, is_blocking=False,
+                               wait_for=wait_for)
     h_8 = h / 8.
     h3_8 = h * 3 / 8.
     h_3 = h / 3.
