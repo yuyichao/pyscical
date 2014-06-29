@@ -88,17 +88,23 @@ def test_wave(ctx_factory):
     y0 = np.r_[(np.sin(xs) + np.sin(xs * 2) + np.sin(xs * 3)
                 + np.sin(xs * 4) + np.sin(xs * 5)) / 5,
                np.zeros(len_x)].astype(np.float32)
-    # y0 = np.r_[[(min((i / len_x) - 0.4, 0.5 - (i / len_x)) * 20
-    #              if 0.4 < (i / len_x) < 0.5 else 0)
-    #             for i in range(len_x)],
-    #            np.zeros(len_x)].astype(np.float32)
+    # y0 += np.r_[np.zeros(len_x),
+    #             [(min((i / len_x) - 0.4, 0.5 - (i / len_x)) * 20
+    #               if 0.4 < (i / len_x) < 0.5 else 0)
+    #               for i in range(len_x)]].astype(np.float32)
+    y0 += np.r_[np.zeros(len_x),
+                [((i / len_x) - 0.2 if 0.15 < (i / len_x) < 0.25 else 0) * 20
+                  for i in range(len_x)]].astype(np.float32)
     # y0 = np.r_[[(1 if 0.4 < (i / len_x) < 0.5 else 0)
     #             for i in range(len_x)],
     #            np.zeros(len_x)].astype(np.float32)
+    y0 += np.r_[[(1 if 0.75 < (i / len_x) < 0.85 else 0)
+                  for i in range(len_x)],
+                  np.zeros(len_x)].astype(np.float32)
 
     res, evt = solve_ode(t0, t1, h, y0, f, queue)
     evt.wait()
-    # res_np = [a.get() for a in res]
+    res_np = [a.get() for a in res]
     # from pylab import plot, show, imshow, figure, colorbar, xlabel, ylabel
     # from pylab import legend, title, savefig, close, grid, xlim, ylim
     # from matplotlib import animation
@@ -117,7 +123,7 @@ def test_wave(ctx_factory):
     #     return line,
     # anim = animation.FuncAnimation(fig, animate, init_func=init,
     #                                frames=len(res_np), interval=10, blit=True)
-    # anim.save('wave.mp4', fps=100)
+    # # anim.save('wave.mp4', fps=100)
     # grid()
     # show()
     # ts = t0 + np.arange(len(res)) * h
@@ -125,3 +131,83 @@ def test_wave(ctx_factory):
     # expect1 = -np.sin(ts)
     # assert np.linalg.norm(res_np[0] - expect0) < 1e-4
     # assert np.linalg.norm(res_np[1] - expect1) < 1e-4
+
+
+def _get_bloch_kernel(ctx):
+    return cl_elwise.get_elwise_kernel(
+        ctx, [VectorArg(np.complex64, 'res', with_offset=True),
+              ConstArg(np.complex64, 'in'), ScalarArg(np.float32, 't'),
+              ScalarArg(np.float32, 'slope'), ScalarArg(np.int32, 'len')],
+              'calc_bloch_wave(res, in, t, slope, len, i)',
+              preamble="#include <bloch_wave.cl>",
+              options=['-I', _path.dirname(__file__)])
+
+
+def test_bloch(ctx_factory):
+    ctx = ctx_factory()
+    queue = cl.CommandQueue(ctx)
+    dev = queue.device
+    if dev.type != cl.device_type.GPU:
+        pytest.skip('Only use GPU')
+    knl = _get_bloch_kernel(ctx)
+
+    t0 = 0
+    t1 = 550
+    h = 0.02
+
+    len_x = 512
+    t_x = 2
+    slope = 0.05
+    # slope = 0
+
+    gs, ls = get_group_sizes(len_x, dev, knl)
+
+    def f(t, y_in, y_out, wait_for=None):
+        return run_elwise_kernel(knl, queue, gs, ls, len_x, wait_for,
+                                 y_out, y_in, t_x, slope, len_x)
+    y0 = np.zeros(len_x).astype(np.complex64)
+    y0[int(len_x / 2)] = 1
+
+    print('start')
+    res, evt = solve_ode(t0, t1, h, y0, f, queue)
+    print('wait')
+    evt.wait()
+    print('done')
+    dn = 19
+    res_np = [np.abs(a.get()) for a in res[::dn]]
+    # for a in res_np:
+    #     a /= max(a)
+    from pylab import plot, show, imshow, figure, colorbar, xlabel, ylabel
+    from pylab import legend, title, savefig, close, grid, xlim, ylim, draw
+    from matplotlib import animation
+    imshow(res_np[:500], vmax=0.2)
+    colorbar()
+    xlabel('Lattice sites')
+    ylabel('Time')
+    savefig('bloch.png')
+    show()
+    # fig = figure()
+    # title('frame: 0')
+    # # line, = plot([], [], linewidth=.5, linestyle='-', marker='.')
+    # line, = plot([], [])
+    # xlim(0, len(res_np[0]))
+    # ylim(0, 1)
+    # xlabel('Lattice sites')
+    # ylabel('Amplitude')
+    # grid()
+
+    # def init():
+    #     line.set_data([], [])
+    #     return line,
+    # def animate(i):
+    #     title('frame: %d' % (i * dn))
+    #     draw()
+    #     x = np.arange(len(res_np[i]))
+    #     y = res_np[i]
+    #     line.set_data(x, y)
+    #     return line,
+    # anim = animation.FuncAnimation(fig, animate, init_func=init,
+    #                                frames=len(res_np), interval=dn, blit=True)
+    # anim.save('bloch2.mp4', fps=int(1000 / dn), bitrate=1000,
+    #           extra_args=['-f', 'webm', '-vcodec', 'libvpx'])
+    # show()
