@@ -177,15 +177,15 @@ def test_bloch(ctx_factory):
     res_np = [np.abs(a.get()) for a in res[::dn]]
     # for a in res_np:
     #     a /= max(a)
-    from pylab import plot, show, imshow, figure, colorbar, xlabel, ylabel
-    from pylab import legend, title, savefig, close, grid, xlim, ylim, draw
-    from matplotlib import animation
-    imshow(res_np[:500], vmax=0.2)
-    colorbar()
-    xlabel('Lattice sites')
-    ylabel('Time')
-    savefig('bloch.png')
-    show()
+    # from pylab import plot, show, imshow, figure, colorbar, xlabel, ylabel
+    # from pylab import legend, title, savefig, close, grid, xlim, ylim, draw
+    # from matplotlib import animation
+    # imshow(res_np[:500], vmax=0.2)
+    # colorbar()
+    # xlabel('Lattice sites')
+    # ylabel('Time')
+    # savefig('bloch.png')
+    # show()
     # fig = figure()
     # title('frame: 0')
     # # line, = plot([], [], linewidth=.5, linestyle='-', marker='.')
