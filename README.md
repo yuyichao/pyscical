@@ -25,3 +25,7 @@ PySciCal is a free software released under GPLv3.
 ### Bloch Oscillation Simulation
 
 ![Bloch Oscillation](test/bloch.png)
+
+<video width="320" height="240" controls>
+    <source src="test/bloch.webm" type="video/webm">
+</video>
