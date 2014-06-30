@@ -14,10 +14,9 @@ from pyopencl.tools import (VectorArg, ScalarArg,
                             pytest_generate_tests)
 
 from pyscical.ocl.ode import solve_ode
-from pyscical.ocl.elwise import ConstArg
-
-from pyscical.ocl.elwise import (get_group_sizes,
+from pyscical.ocl.elwise import (ConstArg, get_group_sizes,
                                  run_kernel as run_elwise_kernel)
+
 
 def _get_harmonic_kernel(ctx):
     prg = cl.Program(ctx, """
@@ -36,9 +35,11 @@ def test_harmonic(ctx_factory):
     queue = cl.CommandQueue(ctx)
     knl = _get_harmonic_kernel(ctx)
     start_evt = cl.UserEvent(ctx)
+
     def f(t, y_in, y_out, wait_for=None):
         knl.set_args(y_in.base_data, y_out.base_data)
         return cl.enqueue_task(queue, knl, wait_for=wait_for + [start_evt])
+
     t0 = 0
     t1 = 40
     h = 0.05
@@ -52,6 +53,7 @@ def test_harmonic(ctx_factory):
     ts = t0 + np.arange(len(res)) * h
     expect0 = np.cos(ts)
     expect1 = -np.sin(ts)
+
     assert np.linalg.norm(res_np[0] - expect0) < 1e-4
     assert np.linalg.norm(res_np[1] - expect1) < 1e-4
 
@@ -61,9 +63,9 @@ def _get_wave_kernel(ctx):
         ctx, [VectorArg(np.float32, 'res', with_offset=True),
               ConstArg(np.float32, 'in'),
               ScalarArg(np.float32, 'h'), ScalarArg(np.int32, 'len')],
-              'calc_wave_func(res, in, h, len, i)',
-              preamble="#include <wave_func.cl>",
-              options=['-I', _path.dirname(__file__)])
+        'calc_wave_func(res, in, h, len, i)',
+        preamble="#include <wave_func.cl>",
+        options=['-I', _path.dirname(__file__)])
 
 
 def test_wave(ctx_factory):
@@ -84,6 +86,7 @@ def test_wave(ctx_factory):
     def f(t, y_in, y_out, wait_for=None):
         return run_elwise_kernel(knl, queue, gs, ls, len_x * 2, wait_for,
                                  y_out, y_in, h_x, len_x)
+
     xs = np.arange(len_x) * np.pi / (len_x - 1)
     y0 = np.r_[(np.sin(xs) + np.sin(xs * 2) + np.sin(xs * 3)
                 + np.sin(xs * 4) + np.sin(xs * 5)) / 5,
@@ -94,13 +97,13 @@ def test_wave(ctx_factory):
     #               for i in range(len_x)]].astype(np.float32)
     y0 += np.r_[np.zeros(len_x),
                 [((i / len_x) - 0.2 if 0.15 < (i / len_x) < 0.25 else 0) * 20
-                  for i in range(len_x)]].astype(np.float32)
+                 for i in range(len_x)]].astype(np.float32)
     # y0 = np.r_[[(1 if 0.4 < (i / len_x) < 0.5 else 0)
     #             for i in range(len_x)],
     #            np.zeros(len_x)].astype(np.float32)
     y0 += np.r_[[(1 if 0.75 < (i / len_x) < 0.85 else 0)
-                  for i in range(len_x)],
-                  np.zeros(len_x)].astype(np.float32)
+                 for i in range(len_x)],
+                np.zeros(len_x)].astype(np.float32)
 
     res, evt = solve_ode(t0, t1, h, y0, f, queue)
     evt.wait()
@@ -116,13 +119,15 @@ def test_wave(ctx_factory):
     # def init():
     #     line.set_data([], [])
     #     return line,
+
     # def animate(i):
     #     x = np.arange(len(res_np[i]))
     #     y = res_np[i]
     #     line.set_data(x, y)
     #     return line,
     # anim = animation.FuncAnimation(fig, animate, init_func=init,
-    #                                frames=len(res_np), interval=10, blit=True)
+    #                                frames=len(res_np),
+    #                                interval=10, blit=True)
     # # anim.save('wave.mp4', fps=100)
     # grid()
     # show()
@@ -138,9 +143,9 @@ def _get_bloch_kernel(ctx):
         ctx, [VectorArg(np.complex64, 'res', with_offset=True),
               ConstArg(np.complex64, 'in'), ScalarArg(np.float32, 't'),
               ScalarArg(np.float32, 'slope'), ScalarArg(np.int32, 'len')],
-              'calc_bloch_wave(res, in, t, slope, len, i)',
-              preamble="#include <bloch_wave.cl>",
-              options=['-I', _path.dirname(__file__)])
+        'calc_bloch_wave(res, in, t, slope, len, i)',
+        preamble="#include <bloch_wave.cl>",
+        options=['-I', _path.dirname(__file__)])
 
 
 def test_bloch(ctx_factory):
@@ -165,6 +170,7 @@ def test_bloch(ctx_factory):
     def f(t, y_in, y_out, wait_for=None):
         return run_elwise_kernel(knl, queue, gs, ls, len_x, wait_for,
                                  y_out, y_in, t_x, slope, len_x)
+
     y0 = np.zeros(len_x).astype(np.complex64)
     y0[int(len_x / 2)] = 1
 
@@ -199,6 +205,7 @@ def test_bloch(ctx_factory):
     # def init():
     #     line.set_data([], [])
     #     return line,
+
     # def animate(i):
     #     title('frame: %d' % (i * dn))
     #     draw()
@@ -207,7 +214,8 @@ def test_bloch(ctx_factory):
     #     line.set_data(x, y)
     #     return line,
     # anim = animation.FuncAnimation(fig, animate, init_func=init,
-    #                                frames=len(res_np), interval=dn, blit=True)
+    #                                frames=len(res_np),
+    #                                interval=dn, blit=True)
     # anim.save('bloch2.mp4', fps=int(1000 / dn), bitrate=1000,
     #           extra_args=['-f', 'webm', '-vcodec', 'libvpx'])
     # show()
