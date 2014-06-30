@@ -11,9 +11,17 @@ PySciCal is a free software released under GPLv3.
 #### On Arch Linux
 [AUR Package](https://aur.archlinux.org/packages.php?ID=56808)
 
-#### Everywhere else for now (From Source)
+#### Everywhere else (From Source)
 
-    $ git clone git@github.com:yuyichao/pyscical.git
+    $ git clone git://github.com/yuyichao/pyscical.git
     $ cd pyscical
-    # python setup install
-    # mkdir -p /usr/bin/ && install -m755 pyscical /usr/bin
+    $ mkdir -p build
+    $ cmake ..
+    $ make
+    # make install
+
+## OpenCL module
+
+### Bloch Oscillation Simulation
+
+![Bloch Oscillation](test/bloch.png)
