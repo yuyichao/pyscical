@@ -16,13 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    # Detect whether we are in IPython. This works because `get_ipython` is
-    # added to __builtins__
-    get_ipython
-except NameError:
-    pass
-else:
+if hasattr(__builtins__, 'get_ipython'):
     from ._ipython import *
 
 from ._general import *

@@ -20,7 +20,7 @@ from math import *
 from math import e as E
 try:
     from scipy import constants as _constants
-except:
+except ImportError:
     from . import _const as _constants
 from .value import Value
 

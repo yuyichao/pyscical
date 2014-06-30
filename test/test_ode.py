@@ -161,7 +161,7 @@ def test_bloch(ctx_factory):
     h = 0.02
 
     len_x = 512
-    t_x = 2
+    t_x = 1
     slope = 0.05
     # slope = 0
 
@@ -172,7 +172,14 @@ def test_bloch(ctx_factory):
                                  y_out, y_in, t_x, slope, len_x)
 
     y0 = np.zeros(len_x).astype(np.complex64)
-    y0[int(len_x / 2)] = 1
+    # y0[int(len_x / 2)] = 1
+
+    # y0[int(len_x * 2 / 5)] = np.sqrt(2) / 2
+    # y0[int(len_x * 3 / 5)] = np.sqrt(2) / 2
+
+    y0[int(len_x * 2 / 5)] = 1 / np.sqrt(3)
+    y0[int(len_x / 2)] = 1 / np.sqrt(3)
+    y0[int(len_x * 3 / 5)] = 1 / np.sqrt(3)
 
     print('start')
     res, evt = solve_ode(t0, t1, h, y0, f, queue)
@@ -183,21 +190,21 @@ def test_bloch(ctx_factory):
     res_np = [np.abs(a.get()) for a in res[::dn]]
     # for a in res_np:
     #     a /= max(a)
-    # from pylab import plot, show, imshow, figure, colorbar, xlabel, ylabel
-    # from pylab import legend, title, savefig, close, grid, xlim, ylim, draw
-    # from matplotlib import animation
+    from pylab import plot, show, imshow, figure, colorbar, xlabel, ylabel
+    from pylab import legend, title, savefig, close, grid, xlim, ylim, draw
+    from matplotlib import animation
     # imshow(res_np[:500], vmax=0.2)
     # colorbar()
     # xlabel('Lattice sites')
     # ylabel('Time')
-    # savefig('bloch.png')
+    # savefig('bloch3.png')
     # show()
     # fig = figure()
     # title('frame: 0')
     # # line, = plot([], [], linewidth=.5, linestyle='-', marker='.')
     # line, = plot([], [])
     # xlim(0, len(res_np[0]))
-    # ylim(0, 1)
+    # ylim(0, 1 / np.sqrt(3))
     # xlabel('Lattice sites')
     # ylabel('Amplitude')
     # grid()
@@ -216,6 +223,6 @@ def test_bloch(ctx_factory):
     # anim = animation.FuncAnimation(fig, animate, init_func=init,
     #                                frames=len(res_np),
     #                                interval=dn, blit=True)
-    # anim.save('bloch2.mp4', fps=int(1000 / dn), bitrate=1000,
+    # anim.save('bloch2.webm', fps=int(1000 / dn), bitrate=1000,
     #           extra_args=['-f', 'webm', '-vcodec', 'libvpx'])
     # show()
