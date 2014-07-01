@@ -152,8 +152,8 @@ def test_bloch(ctx_factory):
     ctx = ctx_factory()
     queue = cl.CommandQueue(ctx)
     dev = queue.device
-    if dev.type != cl.device_type.GPU:
-        pytest.skip('Only use GPU')
+    # if dev.type != cl.device_type.GPU:
+    #     pytest.skip('Only use GPU')
     knl = _get_bloch_kernel(ctx)
 
     t0 = 0
@@ -182,7 +182,9 @@ def test_bloch(ctx_factory):
     y0[int(len_x * 3 / 5)] = 1 / np.sqrt(3)
 
     print('start')
-    res, evt = solve_ode(t0, t1, h, y0, f, queue)
+    start_evt = cl.UserEvent(ctx)
+    res, evt = solve_ode(t0, t1, h, y0, f, queue, wait_for=[start_evt])
+    start_evt.set_status(cl.command_execution_status.COMPLETE)
     print('wait')
     evt.wait()
     print('done')
@@ -190,9 +192,9 @@ def test_bloch(ctx_factory):
     res_np = [np.abs(a.get()) for a in res[::dn]]
     # for a in res_np:
     #     a /= max(a)
-    from pylab import plot, show, imshow, figure, colorbar, xlabel, ylabel
-    from pylab import legend, title, savefig, close, grid, xlim, ylim, draw
-    from matplotlib import animation
+    # from pylab import plot, show, imshow, figure, colorbar, xlabel, ylabel
+    # from pylab import legend, title, savefig, close, grid, xlim, ylim, draw
+    # from matplotlib import animation
     # imshow(res_np[:500], vmax=0.2)
     # colorbar()
     # xlabel('Lattice sites')
