@@ -16,9 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pyscical.ocl.elwise import (lin_comb_diff_kernel,
-                                 get_group_sizes,
-                                 run_kernel as run_elwise_kernel)
+from .elwise import lin_comb_diff_kernel, run_kernel as run_elwise_kernel
+from .utils import get_group_sizes
 
 import pyopencl as cl
 import pyopencl.array as cl_array
@@ -77,3 +76,13 @@ def solve_ode(t0, t1, h, y0, f, queue, wait_for=None):
         prev_evt = _run_comb_knls(3, [prev_evt], next_y, prev_y, ks[0], ks[1],
                                   ks[2], ks[3], h_8, h3_8, h3_8, h_8)
     return ys, prev_evt
+
+
+_ode_solver_kernel_fmt = """
+#define elwise_diff_func {elwise_diff_func}
+#define T_TYPE {t_type}
+#define Y_TYPE {y_type}
+#define EXTRA_ARGS_DEC {extra_args_dec}
+#define EXTRA_ARGS {extra_args}
+#include <pyscical-ode.cl>
+"""

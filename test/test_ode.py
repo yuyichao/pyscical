@@ -14,8 +14,8 @@ from pyopencl.tools import (VectorArg, ScalarArg,
                             pytest_generate_tests)
 
 from pyscical.ocl.ode import solve_ode
-from pyscical.ocl.elwise import (ConstArg, get_group_sizes,
-                                 run_kernel as run_elwise_kernel)
+from pyscical.ocl.elwise import ConstArg, run_kernel as run_elwise_kernel
+from pyscical.ocl.utils import get_group_sizes
 
 
 def _get_harmonic_kernel(ctx):

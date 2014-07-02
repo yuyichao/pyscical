@@ -10,8 +10,8 @@ from pyopencl.characterize import has_double_support
 import pyopencl.array as cl_array
 
 from pyscical.ocl.elwise import (lin_comb_kernel, lin_comb_diff_kernel,
-                                 get_group_sizes,
                                  run_kernel as run_elwise_kernel)
+from pyscical.ocl.utils import get_group_sizes
 
 
 @pytest.mark.parametrize("res_type", [np.float32, np.float64,
@@ -61,8 +61,8 @@ def test_lin_comb(ctx_factory, arg_type):
         if arg_type in (np.float64, np.complex128):
             pytest.skip('Device does not support double.')
     n = 100000
-    a_np = (np.random.randn(n) * 10).astype(arg_type)
-    b_np = (np.random.randn(n) * 10).astype(arg_type)
+    a_np = np.random.randn(n).astype(arg_type)
+    b_np = np.random.randn(n).astype(arg_type)
     queue = cl.CommandQueue(ctx)
 
     a_g = cl.array.to_device(queue, a_np)
@@ -76,11 +76,11 @@ def test_lin_comb(ctx_factory, arg_type):
     evt.wait()
 
     # Check on GPU with PyOpenCL Array:
-    assert np.linalg.norm((res_g - (2 * a_g + 3 * b_g)).get()) == 0
+    assert np.linalg.norm((res_g - (2 * a_g + 3 * b_g)).get()) < 1e-4
 
     # Check on CPU with Numpy:
     res_np = res_g.get()
-    assert np.linalg.norm(res_np - (2 * a_np + 3 * b_np)) == 0
+    assert np.linalg.norm(res_np - (2 * a_np + 3 * b_np)) < 1e-4
 
 
 @pytest.mark.parametrize("arg_type", [np.float32, np.float64,
@@ -110,8 +110,8 @@ def test_lin_comb_diff(ctx_factory, arg_type):
     evt.wait()
 
     # Check on GPU with PyOpenCL Array:
-    assert np.linalg.norm((res_g - (c_g + 2 * a_g + 3 * b_g)).get()) <= 1e-4
+    assert np.linalg.norm((res_g - (c_g + 2 * a_g + 3 * b_g)).get()) <= 2e-4
 
     # Check on CPU with Numpy:
     res_np = res_g.get()
-    assert np.linalg.norm(res_np - (c_np + 2 * a_np + 3 * b_np)) <= 1e-4
+    assert np.linalg.norm(res_np - (c_np + 2 * a_np + 3 * b_np)) <= 2e-4
