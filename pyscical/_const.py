@@ -18,6 +18,7 @@
 
 from math import *
 
+e = 1.602176565e-19
 h = 6.62606957e-34
 hbar = h / 2 / pi
 G = 6.67384e-11
