@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from math import *
+from numpy import pi
 
 e = 1.602176565e-19
 h = 6.62606957e-34
