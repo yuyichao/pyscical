@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from numpy import floor, log10
+import six
 
 __all__ = ['format_unc']
 
@@ -57,6 +58,8 @@ def _format_unc(a, s, unit, sci, tex):
 
 
 def _get_if_list(lst, idx, _def):
+    if isinstance(lst, six.string_types):
+        return lst
     try:
         return lst[idx]
     except IndexError:
