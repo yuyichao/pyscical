@@ -28,10 +28,7 @@ def _format_unc(a, s, unit, sci, tex):
         return '%f%s' % (a, unit)
 
     if sci is None:
-        if s < 100 and (abs(a) > 1 or s > 1):
-            sci = False
-        else:
-            sci = True
+        sci = (s >= 100) or max(abs(a), s) < .1
 
     la = int(floor(log10(abs(a))))
     ls = int(floor(log10(s)))
