@@ -22,11 +22,7 @@ from .utils import get_group_sizes
 import pyopencl as cl
 import pyopencl.array as cl_array
 import numpy as np
-
-try:
-    xrange = xrange
-except:
-    xrange = range
+from six.moves import range as _range
 
 
 def solve_ode(t0, t1, h, y0, f, queue, wait_for=None):
@@ -38,9 +34,9 @@ def solve_ode(t0, t1, h, y0, f, queue, wait_for=None):
     nsteps = int((t1 - t0) / h)
     # Arrays for results in each steps
     ys = [cl_array.Array(queue, y0.shape, y_type, strides=y0.strides)
-          for i in xrange(nsteps + 1)]
+          for i in _range(nsteps + 1)]
     ks = [cl_array.Array(queue, y0.shape, y_type, strides=y0.strides)
-          for i in xrange(4)]
+          for i in _range(4)]
     tmp_y = cl_array.Array(queue, y0.shape, y_type, strides=y0.strides)
     total_size = ys[0].size
     # initialize
@@ -53,14 +49,14 @@ def solve_ode(t0, t1, h, y0, f, queue, wait_for=None):
     h2_3 = h * 2 / 3.
     comb_knls = [lin_comb_diff_kernel(ctx, y_type, y_type, y_type, weight_type,
                                       i, name='ode_lin_diff_%d' % i)
-                 for i in xrange(1, 5)]
+                 for i in _range(1, 5)]
     g_size, l_size = get_group_sizes(total_size, dev, comb_knls[0])
 
     def _run_comb_knls(l, wait_for, *args):
         return run_elwise_kernel(comb_knls[l], queue, g_size, l_size,
                                  total_size, wait_for, *args)
 
-    for i in xrange(nsteps):
+    for i in _range(nsteps):
         prev_y = ys[i]
         next_y = ys[i + 1]
         tn = t0 + i * h

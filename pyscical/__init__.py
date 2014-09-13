@@ -19,7 +19,11 @@
 if hasattr(__builtins__, 'get_ipython'):
     from ._ipython import *
 
-from ._general import *
+from numpy import *
+try:
+    from pylab import *
+except:
+    pass
 from .constants import *
 from .units import *
 from .astro import *

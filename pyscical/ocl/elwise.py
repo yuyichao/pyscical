@@ -22,11 +22,7 @@ import pyopencl as cl
 import pyopencl.elementwise as cl_elwise
 import pyopencl.array as cl_array
 from pyopencl.tools import VectorArg, ScalarArg, dtype_to_ctype
-
-try:
-    xrange = xrange
-except:
-    xrange = range
+from six.moves import range as _range
 
 
 class ConstArg(VectorArg):
@@ -144,14 +140,14 @@ def lin_comb_kernel(ctx, res_type, ary_type, weight_type, length, name=None):
     res_fmt, mul_fmt, _ = _get_lin_comb_expr_fmts(ary_type, weight_type,
                                                   res_type)
     mul_fmt = mul_fmt % ('ary%d[i]', 'weight%d')
-    expr = ' + '.join((mul_fmt % (i, i)) for i in xrange(length))
+    expr = ' + '.join((mul_fmt % (i, i)) for i in _range(length))
     expr = res_fmt % expr
 
     name = name or 'lin_comb_kernel'
     return cl_elwise.get_elwise_kernel(
         ctx, [VectorArg(res_type, 'res', with_offset=True)] +
-        [ConstArg(ary_type, 'ary%d' % i) for i in xrange(length)] +
-        [ScalarArg(weight_type, 'weight%d' % i) for i in xrange(length)],
+        [ConstArg(ary_type, 'ary%d' % i) for i in _range(length)] +
+        [ScalarArg(weight_type, 'weight%d' % i) for i in _range(length)],
         'res[i] = ' + expr, name=name, auto_preamble=True)
 
 
@@ -165,15 +161,15 @@ def lin_comb_diff_kernel(ctx, res_type, base_type, ary_type, weight_type,
     res_fmt, mul_fmt, base_fmt = _get_lin_comb_expr_fmts(ary_type, weight_type,
                                                          res_type, base_type)
     mul_fmt = mul_fmt % ('ary%d[i]', 'weight%d')
-    expr = ' + '.join((mul_fmt % (i, i)) for i in xrange(length))
+    expr = ' + '.join((mul_fmt % (i, i)) for i in _range(length))
     expr = base_fmt % 'base_ary[i]' + ' + ' + res_fmt % expr
 
     name = name or 'lin_comb_diff_kernel'
     return cl_elwise.get_elwise_kernel(
         ctx, [VectorArg(res_type, 'res', with_offset=True),
               ConstArg(base_type, 'base_ary')] +
-        [ConstArg(ary_type, 'ary%d' % i) for i in xrange(length)] +
-        [ScalarArg(weight_type, 'weight%d' % i) for i in xrange(length)],
+        [ConstArg(ary_type, 'ary%d' % i) for i in _range(length)] +
+        [ScalarArg(weight_type, 'weight%d' % i) for i in _range(length)],
         'res[i] = ' + expr, name=name, auto_preamble=True)
 
 

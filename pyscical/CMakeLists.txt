@@ -6,7 +6,6 @@ python_install_module(pyscical
   constants.py
   _const.py
   formatter.py
-  _general.py
   __init__.py
   _ipython.py
   units.py
