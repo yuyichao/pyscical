@@ -18,6 +18,8 @@
 
 # IPython Specifit stuff
 
+__all__ = ['nb_save']
+
 from os import path as _path
 import sys
 

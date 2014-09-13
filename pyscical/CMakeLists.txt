@@ -5,6 +5,7 @@ python_install_module(pyscical
   _cffi.py
   constants.py
   _const.py
+  formatter.py
   _general.py
   __init__.py
   _ipython.py
