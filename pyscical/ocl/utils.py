@@ -15,6 +15,33 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import pyopencl as cl
+from os import path as _path
+
+src_dir = _path.dirname(_path.abspath(__file__))
+
+class CLArg(object):
+    __slots__ = ('__name', '__ctype', '__decl', '__convert')
+    def __init__(self, name, ctype, decl=None, convert=None):
+        self.__name = name
+        self.__ctype = ctype
+        self.__decl = decl if decl else (ctype + ' ' + name)
+        self.__convert = convert
+
+    @property
+    def name(self):
+        return self.__name
+
+    @property
+    def ctype(self):
+        return self.__ctype
+
+    @property
+    def decl(self):
+        return self.__decl
+
+    @property
+    def convert(self):
+        return self.__convert
 
 
 def get_group_sizes(n, dev, kernel=None):

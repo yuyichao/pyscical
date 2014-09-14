@@ -32,7 +32,7 @@ pyscical_ode_solver_iter1(T_TYPE t, T_TYPE h, const __global Y_TYPE *y_in,
     size_t i = get_global_id(0);
     for (;i < n;i += gsize) {
         const Y_TYPE y_in_i = y_in[i];
-        Y_TYPE k = elwise_diff_func(t, y_in, i, y_in_i, EXTRA_ARGS);
+        Y_TYPE k = elwise_diff_func(t, y_in, i, y_in_i EXTRA_ARGS);
         k1[i] = k;
         y_next[i] = y_in_i + h_3 * k;
     }
@@ -49,7 +49,7 @@ pyscical_ode_solver_iter2(T_TYPE t, T_TYPE h, const __global Y_TYPE *y_in,
     size_t i = get_global_id(0);
     for (;i < n;i += gsize) {
         const Y_TYPE y_in_i = y_in[i];
-        Y_TYPE k = elwise_diff_func(t2, y_in, i, y_in_i, EXTRA_ARGS);
+        Y_TYPE k = elwise_diff_func(t2, y_in, i, y_in_i EXTRA_ARGS);
         k2[i] = k;
         y_next[i] = y_in_i + h * ((-2 / 3.0) * k1[i] + k);
     }
@@ -67,7 +67,7 @@ pyscical_ode_solver_iter3(T_TYPE t, T_TYPE h, const __global Y_TYPE *y_in,
     size_t i = get_global_id(0);
     for (;i < n;i += gsize) {
         const Y_TYPE y_in_i = y_in[i];
-        Y_TYPE k = elwise_diff_func(t3, y_in, i, y_in_i, EXTRA_ARGS);
+        Y_TYPE k = elwise_diff_func(t3, y_in, i, y_in_i EXTRA_ARGS);
         k3[i] = k;
         y_next[i] = y_in_i + h * (k1[i] * (4.0 / 3) - k2[i] * 2 + k);
     }
@@ -85,7 +85,7 @@ pyscical_ode_solver_iter4(T_TYPE t, T_TYPE h, const __global Y_TYPE *y_in,
     size_t i = get_global_id(0);
     for (;i < n;i += gsize) {
         const Y_TYPE y_in_i = y_in[i];
-        Y_TYPE k = elwise_diff_func(t4, y_in, i, y_in_i, EXTRA_ARGS);
+        Y_TYPE k = elwise_diff_func(t4, y_in, i, y_in_i EXTRA_ARGS);
         y_next[i] = y_in_i + h_8 * (k - 5 * k3[i] + 11 * k2[i] - 7 * k1[i]);
     }
 }
