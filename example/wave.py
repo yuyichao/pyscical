@@ -17,6 +17,20 @@ from pyscical.ocl.ode import solve_ode, ElwiseOdeSolver
 from pyscical.ocl.elwise import ConstArg, run_kernel as run_elwise_kernel
 from pyscical.ocl.utils import get_group_sizes, CLArg
 
+# t0 = 0
+# t1 = 2
+# h = 0.2
+
+# h_x = 0.2
+# len_x = 2560000
+
+t0 = 0
+t1 = 1000
+h = 0.2
+
+h_x = 0.2
+len_x = 2560
+
 def main():
     ctx = cl.create_some_context()
     queue = cl.CommandQueue(ctx)
@@ -34,13 +48,6 @@ def main():
                              extra_args=(CLArg('h_x', 'float'),
                                          CLArg('len_x', 'ulong')),
                              options=['-I', _path.dirname(__file__)])
-
-    t0 = 0
-    t1 = 1000
-    h = 0.2
-
-    h_x = 0.2
-    len_x = 256
 
     xs = np.arange(len_x) * np.pi / (len_x - 1)
     y0 = np.r_[(np.sin(xs) + np.sin(xs * 2) + np.sin(xs * 3)
@@ -62,31 +69,33 @@ def main():
 
     res, evt = solver.run(t0, t1, h, y0, queue,
                           extra_args=(np.float32(h_x), np.int64(len_x)))
+    print('queued')
     evt.wait()
+    print('finished')
     res_np = [a.get() for a in res]
-    from pylab import plot, show, imshow, figure, colorbar, xlabel, ylabel
-    from pylab import legend, title, savefig, close, grid, xlim, ylim
-    from matplotlib import animation
-    fig = figure()
-    line, = plot([], [], linewidth=2, linestyle='-', marker='.')
-    xlim(0, len(res_np[0]))
-    ylim(-2, 2)
+    # from pylab import plot, show, imshow, figure, colorbar, xlabel, ylabel
+    # from pylab import legend, title, savefig, close, grid, xlim, ylim
+    # from matplotlib import animation
+    # fig = figure()
+    # line, = plot([], [], linewidth=2, linestyle='-', marker='.')
+    # xlim(0, len(res_np[0]))
+    # ylim(-2, 2)
 
-    def init():
-        line.set_data([], [])
-        return line,
+    # def init():
+    #     line.set_data([], [])
+    #     return line,
 
-    def animate(i):
-        x = np.arange(len(res_np[i]))
-        y = res_np[i]
-        line.set_data(x, y)
-        return line,
-    anim = animation.FuncAnimation(fig, animate, init_func=init,
-                                   frames=len(res_np),
-                                   interval=10, blit=True)
-    # anim.save('wave.mp4', fps=100)
-    grid()
-    show()
+    # def animate(i):
+    #     x = np.arange(len(res_np[i]))
+    #     y = res_np[i]
+    #     line.set_data(x, y)
+    #     return line,
+    # anim = animation.FuncAnimation(fig, animate, init_func=init,
+    #                                frames=len(res_np),
+    #                                interval=10, blit=True)
+    # # anim.save('wave.mp4', fps=100)
+    # grid()
+    # show()
 
 
 def _get_wave_kernel(ctx):
@@ -104,13 +113,6 @@ def main2():
     queue = cl.CommandQueue(ctx)
     dev = queue.device
     knl = _get_wave_kernel(ctx)
-
-    t0 = 0
-    t1 = 1000
-    h = 0.2
-
-    h_x = 0.2
-    len_x = 256
 
     gs, ls = get_group_sizes(len_x * 2, dev, knl)
 
@@ -137,32 +139,35 @@ def main2():
                 np.zeros(len_x)].astype(np.float32)
 
     res, evt = solve_ode(t0, t1, h, y0, f, queue)
+    print('queued')
     evt.wait()
+    print('finished')
     res_np = [a.get() for a in res]
-    from pylab import plot, show, imshow, figure, colorbar, xlabel, ylabel
-    from pylab import legend, title, savefig, close, grid, xlim, ylim
-    from matplotlib import animation
-    fig = figure()
-    line, = plot([], [], linewidth=2, linestyle='-', marker='.')
-    xlim(0, len(res_np[0]))
-    ylim(-2, 2)
+    # from pylab import plot, show, imshow, figure, colorbar, xlabel, ylabel
+    # from pylab import legend, title, savefig, close, grid, xlim, ylim
+    # from matplotlib import animation
+    # fig = figure()
+    # line, = plot([], [], linewidth=2, linestyle='-', marker='.')
+    # xlim(0, len(res_np[0]))
+    # ylim(-2, 2)
 
-    def init():
-        line.set_data([], [])
-        return line,
+    # def init():
+    #     line.set_data([], [])
+    #     return line,
 
-    def animate(i):
-        x = np.arange(len(res_np[i]))
-        y = res_np[i]
-        line.set_data(x, y)
-        return line,
-    anim = animation.FuncAnimation(fig, animate, init_func=init,
-                                   frames=len(res_np),
-                                   interval=10, blit=True)
-    # anim.save('wave.mp4', fps=100)
-    grid()
-    show()
+    # def animate(i):
+    #     x = np.arange(len(res_np[i]))
+    #     y = res_np[i]
+    #     line.set_data(x, y)
+    #     return line,
+    # anim = animation.FuncAnimation(fig, animate, init_func=init,
+    #                                frames=len(res_np),
+    #                                interval=10, blit=True)
+    # # anim.save('wave.mp4', fps=100)
+    # grid()
+    # show()
 
 if __name__ == '__main__':
-    main()
-    # main2()
+    for i in range(20):
+        main()
+        # main2()
