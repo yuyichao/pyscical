@@ -27,6 +27,22 @@ genlaguerre(unsigned n, unsigned m, long double x)
     return std::tr1::assoc_laguerre(n, m, x);
 }
 
+static PYSCICAL_INLINE long double
+_lfactorial(unsigned n)
+{
+    static constexpr size_t cache_size = 1024;
+    static long double cache[cache_size] = {0};
+    if (n < cache_size) {
+        if (cache[n] != 0) {
+            return cache[n];
+        } else {
+            cache[n] = std::lgamma(n + 1);
+            return cache[n];
+        }
+    }
+    return std::lgamma(n + 1);
+}
+
 PYSCICAL_EXPORT long double
 harmonic_recoil(unsigned n1, unsigned n2, long double eta)
 {
@@ -44,8 +60,7 @@ harmonic_recoil(unsigned n1, unsigned n2, long double eta)
         return dn == 0 ? 1 : 0;
     }
     auto eta2 = eta * eta;
-    // todo pre-compute lgamma
-    auto lpre = ((-eta2 + std::lgamma(nl + 1) - std::lgamma(ng + 1)) / 2
+    auto lpre = ((-eta2 + _lfactorial(nl) - _lfactorial(ng)) / 2
                  + std::log(eta) * dn);
     auto lag = std::tr1::assoc_laguerre(nl, dn, eta2);
     return static_cast<double>(lag * std::exp(lpre));
