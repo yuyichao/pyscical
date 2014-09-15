@@ -64,7 +64,7 @@ harmonic_recoil(unsigned n1, unsigned n2, long double eta)
     auto lpre = ((-eta2 + _lfactorial(nl) - _lfactorial(ng)) / 2
                  + std::log(eta) * dn);
     auto lag = std::tr1::assoc_laguerre(nl, dn, eta2);
-    return static_cast<double>(lag * std::exp(lpre));
+    return lag * std::exp(lpre);
 }
 
 static constexpr unsigned _theta_n = 21;
