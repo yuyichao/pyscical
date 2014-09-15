@@ -39,9 +39,11 @@ def compose_gJ(J, L, S):
 def compose_gF(F, I, J, L, S, g_I=0.0):
     return compose_g(F, I, J, g_I, compose_gJ(J, L, S))
 
+
 def sideband_strength(n1, n2, eta):
     # change this to float128 after pypy support it
     return float(_lib.harmonic_recoil(n1, n2, eta))
+
 
 def sideband_scatter_strength(n1, n2, eta, theta0):
     # change this to float128 after pypy support it

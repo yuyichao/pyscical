@@ -19,8 +19,10 @@ from os import path as _path
 
 src_dir = _path.dirname(_path.abspath(__file__))
 
+
 class CLArg(object):
     __slots__ = ('__name', '__ctype', '__decl', '__convert')
+
     def __init__(self, name, ctype, decl=None, convert=None):
         self.__name = name
         self.__ctype = ctype

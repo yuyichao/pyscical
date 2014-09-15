@@ -18,12 +18,16 @@ from numpy import *
 
 __all__ = ['Focus']
 
+
 class Focus(object):
     """
     The focus of a light beam.
     """
+    __slots__ = ['__fnum', '__lamb']
+
     def __init_theta(self, sin_t):
         self.__fnum = sqrt(1 / sin_t**2 - 1)
+
     def __init__(self, lamb=None, **kws):
         self.__lamb = lamb
         if 'fnum' in kws:
@@ -37,18 +41,23 @@ class Focus(object):
             raise TypeError('no arguments to initialize Focus')
         if kws:
             raise TypeError('too many arguments to initialize Focus')
+
     def I0(self, P):
         """Intensity at the center of the focus with power P."""
         return P * pi / (self.__lamb * self.__fnum)**2
+
     @property
     def quad_r(self):
         return (pi / self.__lamb / self.__fnum)**2
+
     @property
     def quad_l(self):
         return (pi / self.__lamb / self.__fnum**2)**2 / 12
+
     @property
     def radius_r(self):
         return sqrt(2) * self.__lamb / pi * self.__fnum
+
     @property
     def radius_l(self):
         return 2 * sqrt(6) * self.__lamb / pi * self.__fnum**2

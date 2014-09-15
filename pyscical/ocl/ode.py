@@ -130,8 +130,8 @@ class ElwiseOdeSolver(object):
         total_size = ys[0].size
         # initialize
         prev_evt = cl.enqueue_copy(queue, ys[0].base_data, y0,
-                                   device_offset=ys[0].offset, is_blocking=False,
-                                   wait_for=wait_for)
+                                   device_offset=ys[0].offset,
+                                   is_blocking=False, wait_for=wait_for)
         it1_knl = self.__prog.pyscical_ode_solver_iter1
         it2_knl = self.__prog.pyscical_ode_solver_iter2
         it3_knl = self.__prog.pyscical_ode_solver_iter3
