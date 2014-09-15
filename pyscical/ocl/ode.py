@@ -124,7 +124,7 @@ class ElwiseOdeSolver(object):
         ys = [cl_array.Array(queue, y0.shape, y_type, strides=y0.strides)
               for i in _range(nsteps + 1)]
         ks = [cl_array.Array(queue, y0.shape, y_type, strides=y0.strides)
-              for i in _range(4)]
+              for i in _range(3)]
         tmp_y1 = cl_array.Array(queue, y0.shape, y_type, strides=y0.strides)
         tmp_y2 = cl_array.Array(queue, y0.shape, y_type, strides=y0.strides)
         total_size = ys[0].size
@@ -153,21 +153,21 @@ class ElwiseOdeSolver(object):
                          ys[1].base_data, np.int64(total_size), *extra_args)
 
         for i in _range(nsteps):
-            t = i * h + t0
-            it1_knl.set_arg(0, t_type(t))
+            t = t_type(i * h + t0)
+            it1_knl.set_arg(0, t)
             it1_knl.set_arg(2, ys[i].base_data)
             prev_evt = cl.enqueue_nd_range_kernel(queue, it1_knl, g_size,
                                                   l_size, None, [prev_evt])
 
-            it2_knl.set_arg(0, t_type(t))
+            it2_knl.set_arg(0, t)
             prev_evt = cl.enqueue_nd_range_kernel(queue, it2_knl, g_size,
                                                   l_size, None, [prev_evt])
 
-            it3_knl.set_arg(0, t_type(t))
+            it3_knl.set_arg(0, t)
             prev_evt = cl.enqueue_nd_range_kernel(queue, it3_knl, g_size,
                                                   l_size, None, [prev_evt])
 
-            it4_knl.set_arg(0, t_type(t))
+            it4_knl.set_arg(0, t)
             it4_knl.set_arg(6, ys[i + 1].base_data)
             prev_evt = cl.enqueue_nd_range_kernel(queue, it4_knl, g_size,
                                                   l_size, None, [prev_evt])
