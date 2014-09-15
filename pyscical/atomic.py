@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # Copyright (C) 2014~2014 by Yichao Yu
 # yyc1992@gmail.com
 #
@@ -20,6 +18,7 @@ __all__ = ['compose_g', 'compose_gJ', 'compose_gF']
 
 from .constants import *
 import sys
+from ._cffi import _ffi, _lib
 
 
 def compose_g(J_sum, J1, J2, g1, g2):
@@ -39,9 +38,16 @@ def compose_gJ(J, L, S):
 def compose_gF(F, I, J, L, S, g_I=0.0):
     return compose_g(F, I, J, g_I, compose_gJ(J, L, S))
 
+def sideband_strength(n1, n2, eta):
+    # change this to float128 after pypy support it
+    return float(_lib.harmonic_recoil(n1, n2, eta))
+
+def sideband_scatter_strength(n1, n2, eta, theta0):
+    # change this to float128 after pypy support it
+    return float(_lib.harmonic_scatter(n1, n2, eta, theta0))
+
 # pure python version is faster than cffi wrapper on pypy
 if '__pypy__' not in sys.modules:
-    from ._cffi import _ffi, _lib
     compose_g = _lib.compose_g
     compose_gJ = _lib.compose_gJ
 

@@ -1,5 +1,6 @@
 set(pyscical_SRCS
-  atomic.c)
+  atomic.c
+  math.cpp)
 
 add_library(pyscical SHARED
   ${pyscical_SRCS})
