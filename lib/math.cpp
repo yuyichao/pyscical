@@ -20,6 +20,7 @@
 #include <tr1/cmath>
 #include <array>
 #include <iostream>
+#include <atomic>
 
 PYSCICAL_EXPORT long double
 genlaguerre(unsigned n, unsigned m, long double x)
@@ -36,11 +37,11 @@ _lfactorial(unsigned n)
         if (cache[n] != 0) {
             return cache[n];
         } else {
-            cache[n] = std::lgamma(n + 1);
+            cache[n] = std::lgamma((long double)(n + 1));
             return cache[n];
         }
     }
-    return std::lgamma(n + 1);
+    return std::lgamma((long double)(n + 1));
 }
 
 PYSCICAL_EXPORT long double
@@ -117,12 +118,17 @@ const static long double sum_cos_thetas = sum_array(cos_thetas);
 PYSCICAL_EXPORT long double
 harmonic_scatter(unsigned n1, unsigned n2, long double eta, long double theta0)
 {
+    long double strengths[_theta_n];
     long double s0 = sin(theta0);
-    long double sum = 0;
+#pragma omp parallel for
     for (unsigned i = 0;i < _theta_n;i++) {
         long double strength =
             harmonic_recoil(n1, n2, eta * std::abs(sin_thetas[i] - s0));
-        sum += strength * strength * cos_thetas[i];
+        strengths[i] = strength * strength * cos_thetas[i];
+    }
+    long double sum = 0;
+    for (unsigned i = 0;i < _theta_n;i++) {
+        sum += strengths[i];
     }
     return sum / sum_cos_thetas;
 }

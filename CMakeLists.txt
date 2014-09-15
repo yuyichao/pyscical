@@ -23,10 +23,10 @@ if(NOT BIN_NAME)
   set(BIN_NAME pyscical)
 endif()
 
-cmake_c_add_flags(CMAKE_C_FLAGS -Wall -Wextra -std=gnu99)
+cmake_c_add_flags(CMAKE_C_FLAGS -Wall -Wextra -std=gnu99 -fopenmp)
 # -std=c++0x is deprecated but gcc < 4.7 do not recognise c++11 ....
 cmake_c_add_flags(CMAKE_CXX_FLAGS -Wall -Wextra
-  -Wno-deprecated-register -std=c++0x)
+  -Wno-deprecated-register -std=c++0x -fopenmp)
 cmake_c_add_flags(CMAKE_SHARED_LINKER_FLAGS -Wl,--as-needed -Wl,--no-undefined)
 cmake_c_add_flags(CMAKE_MODULE_LINKER_FLAGS -Wl,--as-needed -Wl,--no-undefined)
 
