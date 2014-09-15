@@ -8,6 +8,7 @@ python_install_module(pyscical
   formatter.py
   __init__.py
   _ipython.py
+  optics.py
   units.py
   value.py)
 
