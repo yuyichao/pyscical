@@ -48,10 +48,14 @@ class Focus(object):
 
     @property
     def quad_r(self):
+        # Comes from the expension of (2 * J_1(v) / v)**2
+        # where v = 2 * pi / lambda / f# * r
         return (pi / self.__lamb / self.__fnum)**2
 
     @property
     def quad_l(self):
+        # Comes from the expension of (sin(u / 4) / (u / 4))**2
+        # where u = 2 * pi / lambda / f#**2 * z
         return (pi / self.__lamb / self.__fnum**2)**2 / 12
 
     @property
