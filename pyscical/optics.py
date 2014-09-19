@@ -65,3 +65,11 @@ class Focus(object):
     @property
     def radius_l(self):
         return 2 * sqrt(6) * self.__lamb / pi * self.__fnum**2
+
+    @property
+    def lamb(self):
+        return self.__lamb
+
+    @property
+    def fnum(self):
+        return self.__fnum
