@@ -42,7 +42,7 @@ class Focus(object):
         if kws:
             raise TypeError('too many arguments to initialize Focus')
 
-    def I0(self, P):
+    def focus_I(self, P):
         """Intensity at the center of the focus with power P."""
         return P * pi / (self.__lamb * self.__fnum)**2
 
@@ -60,11 +60,11 @@ class Focus(object):
 
     @property
     def radius_r(self):
-        return sqrt(2) * self.__lamb / pi * self.__fnum
+        return sqrt(2) * self.__lamb * self.__fnum / pi
 
     @property
     def radius_l(self):
-        return 2 * sqrt(6) * self.__lamb / pi * self.__fnum**2
+        return 2 * sqrt(6) * self.__lamb * self.__fnum**2 / pi
 
     @property
     def lamb(self):
