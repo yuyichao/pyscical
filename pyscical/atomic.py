@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 __all__ = ['compose_g', 'compose_gJ', 'compose_gF', 'sideband_strength',
-           'sideband_scatter_strength']
+           'sideband_scatter_strength', 'Transition']
 
 from .constants import *
 import sys
@@ -48,6 +48,39 @@ def sideband_strength(n1, n2, eta):
 def sideband_scatter_strength(n1, n2, eta, theta0):
     # change this to float128 after pypy support it
     return float(_lib.harmonic_scatter(n1, n2, eta, theta0))
+
+
+class Transition(object):
+    def __init__(self, **kws):
+        if 'freq' in kws:
+            self.__freq = kws.pop('freq')
+        elif 'lamb' in kws:
+            self.__freq = c_0 / kws.pop('lamb')
+        else:
+            raise TypeError('no arguments to initialize frequency')
+        if 'dipole' in kws:
+            self.__dipole = kws.pop('dipole')
+        else:
+            raise TypeError('no arguments to initialize dipole moment')
+        if kws:
+            raise TypeError('too many arguments to initialize Transition')
+
+    @property
+    def freq(self):
+        return self.__freq
+
+    @property
+    def lamb(self):
+        return c_0 / self.__freq
+
+    @property
+    def dipole(self):
+        return self.__dipole
+
+    def ac_stark(self, freq, I=1):
+        return -(self.__dipole**2 * I / 2 / hbar / c_0 / epsilon_0
+                 * (1 / (self.__freq - freq) + 1 / (self.__freq + freq)))
+
 
 # pure python version is faster than cffi wrapper on pypy
 if '__pypy__' not in sys.modules:
