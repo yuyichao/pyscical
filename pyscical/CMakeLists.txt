@@ -10,6 +10,7 @@ python_install_module(pyscical
   _ipython.py
   optics.py
   units.py
+  utils.py
   value.py)
 
 python_install_module(pyscical/ocl
