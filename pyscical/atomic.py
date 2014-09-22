@@ -20,7 +20,7 @@ __all__ = ['compose_g', 'compose_gJ', 'compose_gF', 'sideband_strength',
 from .constants import *
 import sys
 from ._cffi import _ffi, _lib
-from optics import Focus
+from .optics import Focus
 
 
 def compose_g(J_sum, J1, J2, g1, g2):
