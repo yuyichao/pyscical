@@ -5,7 +5,7 @@ set(pyscical_SRCS
 add_library(pyscical SHARED
   ${pyscical_SRCS})
 
-target_link_libraries(pyscical ${qtcurve_utils_LINKS})
+# target_link_libraries(pyscical)
 
 set_target_properties(pyscical PROPERTIES
   COMPILE_FLAGS "-fvisibility=hidden"
