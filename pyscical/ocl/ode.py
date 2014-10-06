@@ -84,13 +84,16 @@ _ode_solver_kernel_fmt = """
 #define Y_TYPE {y_type}
 #define EXTRA_ARGS_DEC {extra_args_decl}
 #define EXTRA_ARGS {extra_args_name}
+#define elwise_post_func {post_func}
+#define HAS_POST_FUNC {has_post_func}
 #include <pyscical-ode.cl>
 """
 
 
 class ElwiseOdeSolver(object):
     def __init__(self, ctx, dev, src, func_name, t_type=np.float32,
-                 y_type=np.float32, extra_args=None, options=None):
+                 y_type=np.float32, extra_args=None, options=None,
+                 post_func=None):
         t_type = np.dtype(t_type)
         y_type = np.dtype(y_type)
         if not extra_args:
@@ -104,7 +107,9 @@ class ElwiseOdeSolver(object):
             t_type=dtype_to_ctype(t_type),
             y_type=dtype_to_ctype(y_type),
             extra_args_decl=extra_args_decl,
-            extra_args_name=extra_args_name)
+            extra_args_name=extra_args_name,
+            post_func=post_func or '',
+            has_post_func='1' if post_func else '0')
         whole_src = src + solver_kernel_src
 
         options = (options or []) + ['-I', cl_src_dir + '/cl']
@@ -114,6 +119,7 @@ class ElwiseOdeSolver(object):
         self.__t_type = t_type
         self.__prog = cl.Program(ctx, whole_src)
         self.__prog.build(options=options, devices=[dev])
+        self.__has_post = bool(post_func)
 
     def run(self, t0, t1, h, y0, queue, extra_args=(), wait_for=None):
         # TODO?
@@ -136,6 +142,8 @@ class ElwiseOdeSolver(object):
         it2_knl = self.__prog.pyscical_ode_solver_iter2
         it3_knl = self.__prog.pyscical_ode_solver_iter3
         it4_knl = self.__prog.pyscical_ode_solver_iter4
+        if self.__has_post:
+            post_knl = self.__prog.pyscical_ode_solver_post
         g_size, l_size = get_group_sizes(total_size, self.__dev, it1_knl)
 
         t_type = self.__t_type.type
@@ -151,6 +159,8 @@ class ElwiseOdeSolver(object):
         it4_knl.set_args(t_type(t0), t_type(h), tmp_y1.base_data,
                          ks[0].base_data, ks[1].base_data, ks[2].base_data,
                          ys[1].base_data, np.int64(total_size), *extra_args)
+        post_knl.set_args(t_type(t0), t_type(h), ys[1].base_data,
+                          np.int64(total_size), *extra_args)
 
         for i in _range(nsteps):
             t = t_type(i * h + t0)
@@ -171,4 +181,10 @@ class ElwiseOdeSolver(object):
             it4_knl.set_arg(6, ys[i + 1].base_data)
             prev_evt = cl.enqueue_nd_range_kernel(queue, it4_knl, g_size,
                                                   l_size, None, [prev_evt])
+            if self.__has_post:
+                post_knl.set_arg(0, t)
+                post_knl.set_arg(2, ys[i + 1].base_data)
+                prev_evt = cl.enqueue_nd_range_kernel(queue, post_knl, g_size,
+                                                      l_size, None, [prev_evt])
+
         return ys, prev_evt

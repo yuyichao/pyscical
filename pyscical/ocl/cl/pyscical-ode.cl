@@ -21,6 +21,23 @@
 // Y_TYPE
 // EXTRA_ARGS_DEC
 // EXTRA_ARGS
+// elwise_post_func
+// HAS_POST_FUNC
+
+#if HAS_POST_FUNC
+
+__kernel void
+pyscical_ode_solver_post(T_TYPE t, T_TYPE h, __global Y_TYPE *y,
+                         ulong n EXTRA_ARGS_DEC)
+{
+    const size_t gsize = get_global_size(0);
+    size_t i = get_global_id(0);
+    for (;i < n;i += gsize) {
+        elwise_post_func(t, y, i EXTRA_ARGS);
+    }
+}
+
+#endif
 
 __kernel void
 pyscical_ode_solver_iter1(T_TYPE t, T_TYPE h, const __global Y_TYPE *y_in,
