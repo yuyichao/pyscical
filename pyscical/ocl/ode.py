@@ -159,8 +159,9 @@ class ElwiseOdeSolver(object):
         it4_knl.set_args(t_type(t0), t_type(h), tmp_y1.base_data,
                          ks[0].base_data, ks[1].base_data, ks[2].base_data,
                          ys[1].base_data, np.int64(total_size), *extra_args)
-        post_knl.set_args(t_type(t0), t_type(h), ys[1].base_data,
-                          np.int64(total_size), *extra_args)
+        if self.__has_post:
+            post_knl.set_args(t_type(t0), t_type(h), ys[1].base_data,
+                              np.int64(total_size), *extra_args)
 
         for i in _range(nsteps):
             t = t_type(i * h + t0)
